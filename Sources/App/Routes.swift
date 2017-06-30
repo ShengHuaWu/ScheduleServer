@@ -13,10 +13,18 @@ extension Droplet {
             }
         }
         
-        get("test") { (req) in
-            let lesson = Lesson(title: "English")
-            try lesson.save()
+        get("lessons") { (req) in
             return try JSON(node: Lesson.all().map { try $0.makeJSON() })
+        }
+        
+        post("lessons") { (req) in
+            guard let title = req.data["title"]?.string else {
+                throw Abort.badRequest
+            }
+            
+            let lesson = Lesson(title: title)
+            try lesson.save()
+            return try lesson.makeJSON()
         }
     }
 }
