@@ -41,5 +41,15 @@ extension Droplet {
             try lesson.save()
             return try lesson.makeJSON()
         }
+        
+        delete("lessons", Int.parameter) { (req) in
+            let id = try req.parameters.next(Int.self)
+            guard let lesson = try Lesson.makeQuery().filter("id", id).first() else {
+                throw Abort.notFound
+            }
+            
+            try lesson.delete()
+            return try lesson.makeJSON()
+        }
     }
 }
