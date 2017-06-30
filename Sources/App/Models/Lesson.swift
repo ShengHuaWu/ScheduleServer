@@ -11,7 +11,7 @@ import PostgreSQLProvider
 final class Lesson: Model {
     let storage = Storage() // This is for Storable protocol
     
-    let title: String
+    var title: String
     
     init(title: String) {
         self.title = title
