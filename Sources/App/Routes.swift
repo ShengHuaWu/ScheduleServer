@@ -11,7 +11,7 @@ extension Droplet {
     func setupLessonRoutes() {
         group("lessons") { (lessons) in
             lessons.get("") { (req) in
-                return try JSON(node: Lesson.all().map { try $0.makeJSON() })
+                return try Lesson.all().makeJSON()
             }
             
             lessons.get(Int.parameter) { (req) in
@@ -20,7 +20,7 @@ extension Droplet {
                     throw Abort.notFound
                 }
                 
-                return try lesson.makeJSON()
+                return lesson
             }
             
             lessons.post("") { (req) in
@@ -30,7 +30,7 @@ extension Droplet {
                 
                 let lesson = Lesson(title: title)
                 try lesson.save()
-                return try lesson.makeJSON()
+                return lesson
             }
             
             lessons.put(Int.parameter) { (req) in
@@ -45,7 +45,7 @@ extension Droplet {
                 
                 lesson.title = title
                 try lesson.save()
-                return try lesson.makeJSON()
+                return lesson
             }
             
             lessons.delete(Int.parameter) { (req) in
@@ -55,7 +55,7 @@ extension Droplet {
                 }
                 
                 try lesson.delete()
-                return try lesson.makeJSON()
+                return lesson
             }
         }
     }

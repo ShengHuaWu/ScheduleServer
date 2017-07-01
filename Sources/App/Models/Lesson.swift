@@ -41,7 +41,11 @@ extension Lesson: Preparation {
     }
 }
 
-extension Lesson: JSONRepresentable {
+extension Lesson: JSONConvertible {
+    convenience init(json: JSON) throws {
+        self.init(title: try json.get("title"))
+    }
+    
     func makeJSON() throws -> JSON {
         var json = JSON()
         try json.set("id", id?.string)
@@ -49,3 +53,5 @@ extension Lesson: JSONRepresentable {
         return json
     }
 }
+
+extension Lesson: ResponseRepresentable {}
