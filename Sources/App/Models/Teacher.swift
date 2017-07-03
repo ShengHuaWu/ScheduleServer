@@ -1,41 +1,41 @@
 //
-//  Class.swift
+//  Teacher.swift
 //  ScheduleServer
 //
-//  Created by ShengHua Wu on 29/06/2017.
+//  Created by ShengHua Wu on 03/07/2017.
 //
 //
 
 import PostgreSQLProvider
 
-final class Lesson: Model {
+final class Teacher: Model {
     let storage = Storage() // This is for Storable protocol
     
-    var title: String
+    var name: String
     
     static let idKey = "id"
-    static let titleKey = "title"
+    static let nameKey = "name"
     
-    init(title: String) {
-        self.title = title
+    init(name: String) {
+        self.name = name
     }
     
     init(row: Row) throws {
-        self.title = try row.get(Lesson.titleKey)
+        self.name = try row.get(Teacher.nameKey)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set(Lesson.titleKey, title)
+        try row.set(Teacher.nameKey, name)
         return row
     }
 }
 
-extension Lesson: Preparation {
+extension Teacher: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { (user) in
             user.id()
-            user.string(Lesson.titleKey)
+            user.string(Teacher.nameKey)
         }
     }
     
@@ -44,17 +44,17 @@ extension Lesson: Preparation {
     }
 }
 
-extension Lesson: JSONConvertible {
+extension Teacher: JSONConvertible {
     convenience init(json: JSON) throws {
-        self.init(title: try json.get(Lesson.titleKey))
+        self.init(name: try json.get(Teacher.nameKey))
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set(Lesson.idKey, id?.string)
-        try json.set(Lesson.titleKey, title)
+        try json.set(Teacher.idKey, id?.string)
+        try json.set(Teacher.nameKey, name)
         return json
     }
 }
 
-extension Lesson: ResponseRepresentable {}
+extension Teacher: ResponseRepresentable {}

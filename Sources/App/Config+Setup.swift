@@ -22,5 +22,6 @@ extension Config {
     private func setupPreparations() throws {
         preparations.append(Post.self)
         preparations.append(Lesson.self)
+        preparations.append(Teacher.self)
     }
 }

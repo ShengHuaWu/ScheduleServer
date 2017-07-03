@@ -47,7 +47,7 @@ final class LessonController: ResourceRepresentable {
 }
 
 extension Request {
-    func lesson() throws -> Lesson {
+    fileprivate func lesson() throws -> Lesson {
         guard let json = json else { throw Abort.badRequest }
         
         return try Lesson(json: json)
