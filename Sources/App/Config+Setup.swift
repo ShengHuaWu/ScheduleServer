@@ -23,5 +23,6 @@ extension Config {
         preparations.append(Post.self)
         preparations.append(Lesson.self)
         preparations.append(Teacher.self)
+        preparations.append(Student.self)
     }
 }

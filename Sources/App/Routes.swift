@@ -7,5 +7,8 @@ extension Droplet {
         
         let teacherController = TeacherController()
         resource("teachers", teacherController)
+        
+        let studentController = StudentController()
+        resource("students", studentController)
     }
 }
