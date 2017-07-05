@@ -2,6 +2,7 @@ import Vapor
 
 extension Droplet {
     func setupRoutes() throws {
+        // Add routes with -resource method
         let lessonController = LessonController()
         resource("lessons", lessonController)
         

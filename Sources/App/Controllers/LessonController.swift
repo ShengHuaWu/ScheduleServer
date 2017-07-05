@@ -8,33 +8,36 @@
 
 import PostgreSQLProvider
 
-final class LessonController: ResourceRepresentable {
-    private func getAll(request: Request) throws -> ResponseRepresentable {
+final class LessonController {
+    fileprivate func getAll(request: Request) throws -> ResponseRepresentable {
         return try Lesson.all().makeJSON()
     }
     
-    private func getOne(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
+    fileprivate func getOne(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
         return lesson
     }
     
-    private func create(request: Request) throws -> ResponseRepresentable {
+    fileprivate func create(request: Request) throws -> ResponseRepresentable {
         let lesson = try request.lesson()
         try lesson.save()
         return lesson
     }
     
-    private func update(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
+    fileprivate func update(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
         let newLesson = try request.lesson()
         lesson.title = newLesson.title
         try lesson.save()
         return lesson
     }
     
-    private func delete(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
+    fileprivate func delete(request: Request, lesson: Lesson) throws -> ResponseRepresentable {
         try lesson.delete()
         return lesson
     }
-    
+}
+
+// Notice the difference between Item and Muliple
+extension LessonController: ResourceRepresentable {
     func makeResource() -> Resource<Lesson> {
         return Resource(
             index: getAll,
@@ -46,6 +49,7 @@ final class LessonController: ResourceRepresentable {
     }
 }
 
+// Convenience of retrieving Lesson object
 extension Request {
     fileprivate func lesson() throws -> Lesson {
         guard let json = json else { throw Abort.badRequest }

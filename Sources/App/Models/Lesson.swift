@@ -13,6 +13,7 @@ final class Lesson: Model {
     
     var title: String
     
+    // Use these keys instead of magic strings
     static let idKey = "id"
     static let titleKey = "title"
     
@@ -31,6 +32,7 @@ final class Lesson: Model {
     }
 }
 
+// For database prepare and revert
 extension Lesson: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { (user) in
@@ -44,6 +46,7 @@ extension Lesson: Preparation {
     }
 }
 
+// Convenience of generate model from JSON
 extension Lesson: JSONConvertible {
     convenience init(json: JSON) throws {
         self.init(title: try json.get(Lesson.titleKey))
@@ -57,4 +60,5 @@ extension Lesson: JSONConvertible {
     }
 }
 
+// Convenience of returning response
 extension Lesson: ResponseRepresentable {}
