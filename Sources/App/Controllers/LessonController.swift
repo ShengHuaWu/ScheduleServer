@@ -37,6 +37,7 @@ final class LessonController {
     
     // TODO: Need refactoring
     func addRoutes(_ drop: Droplet) {
+        // Perhaps, it is better not to use ResourceRepresentable protocol
         drop.get("lessons", Int.parameter, "teachers", handler: teachersIndex)
     }
     

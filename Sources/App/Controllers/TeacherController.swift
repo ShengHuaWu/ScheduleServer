@@ -40,6 +40,7 @@ final class TeacherController {
         drop.get("teachers", Int.parameter, "lesson", handler: userIndex)
     }
     
+    // Should consider many to many relationship
     private func userIndex(request: Request) throws -> ResponseRepresentable {
         guard let teacher = try Teacher.makeQuery().filter("id", request.parameters.next() as Int).first() else {
             throw Abort.badRequest

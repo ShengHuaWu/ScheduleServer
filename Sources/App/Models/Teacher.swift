@@ -12,7 +12,7 @@ final class Teacher: Model {
     let storage = Storage() // This is for Storable protocol
     
     var name: String
-    var lessonId: Identifier?
+    var lessonId: Identifier? // Should use Identifier instead of Node
     
     static let idKey = "id"
     static let nameKey = "name"
