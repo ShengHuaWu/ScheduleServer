@@ -45,8 +45,7 @@ final class LessonController {
             throw Abort.badRequest
         }
         
-        let teachers = try lesson.children(type: Teacher.self).all()
-        return try teachers.makeJSON()
+        return try lesson.teachers().makeJSON()
     }
 }
 
@@ -69,5 +68,12 @@ extension Request {
         guard let json = json else { throw Abort.badRequest }
         
         return try Lesson(json: json)
+    }
+}
+
+// Convenience of retrieving Teacher children
+extension Lesson {
+    func teachers() throws -> [Teacher] {
+        return try children(type: Teacher.self).all()
     }
 }
