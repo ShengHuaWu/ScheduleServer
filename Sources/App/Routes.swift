@@ -9,6 +9,7 @@ extension Droplet {
         
         let teacherController = TeacherController()
         resource("teachers", teacherController)
+        teacherController.addRoutes(self)
         
         let studentController = StudentController()
         resource("students", studentController)

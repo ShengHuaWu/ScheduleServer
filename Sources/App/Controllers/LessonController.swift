@@ -35,7 +35,7 @@ final class LessonController {
         return lesson
     }
     
-    // TODO: Need to refactor
+    // TODO: Need refactoring
     func addRoutes(_ drop: Droplet) {
         drop.get("lessons", Int.parameter, "teachers", handler: teachersIndex)
     }

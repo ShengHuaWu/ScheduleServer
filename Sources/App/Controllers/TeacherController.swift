@@ -8,33 +8,48 @@
 
 import PostgreSQLProvider
 
-final class TeacherController: ResourceRepresentable {
-    private func getAll(request: Request) throws -> ResponseRepresentable {
+final class TeacherController {
+    fileprivate func getAll(request: Request) throws -> ResponseRepresentable {
         return try Teacher.all().makeJSON()
     }
     
-    private func getOne(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
+    fileprivate func getOne(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
         return teacher
     }
     
-    private func create(request: Request) throws -> ResponseRepresentable {
+    fileprivate func create(request: Request) throws -> ResponseRepresentable {
         let teacher = try request.teacher()
         try teacher.save()
         return teacher
     }
     
-    private func update(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
+    fileprivate func update(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
         let newTeacher = try request.teacher()
         teacher.name = newTeacher.name
         try teacher.save()
         return teacher
     }
     
-    private func delete(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
+    fileprivate func delete(request: Request, teacher: Teacher) throws -> ResponseRepresentable {
         try teacher.delete()
         return teacher
     }
     
+    // TODO: Need refactoring
+    func addRoutes(_ drop: Droplet) {
+        drop.get("teachers", Int.parameter, "lesson", handler: userIndex)
+    }
+    
+    private func userIndex(request: Request) throws -> ResponseRepresentable {
+        guard let teacher = try Teacher.makeQuery().filter("id", request.parameters.next() as Int).first() else {
+            throw Abort.badRequest
+        }
+        
+        return try JSON(node: teacher.lesson())
+    }
+}
+
+extension TeacherController: ResourceRepresentable {
     func makeResource() -> Resource<Teacher> {
         return Resource(
             index: getAll,
@@ -51,5 +66,11 @@ extension Request {
         guard let json = json else { throw Abort.badRequest }
         
         return try Teacher(json: json)
+    }
+}
+
+extension Teacher {
+    func lesson() throws -> Lesson? {
+        return try parent(id: lessonId, type: Lesson.self).get()
     }
 }

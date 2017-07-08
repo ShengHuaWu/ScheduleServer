@@ -12,13 +12,13 @@ final class Teacher: Model {
     let storage = Storage() // This is for Storable protocol
     
     var name: String
-    var lessonId: Node?
+    var lessonId: Identifier?
     
     static let idKey = "id"
     static let nameKey = "name"
     static let lessonIdKey = "lesson_id"
     
-    init(name: String, lessonId: Node? = nil) {
+    init(name: String, lessonId: Identifier? = nil) {
         self.name = name
         self.lessonId = lessonId
     }
@@ -53,7 +53,7 @@ extension Teacher: Preparation {
 extension Teacher: JSONConvertible {
     convenience init(json: JSON) throws {
         let name: String = try json.get(Teacher.nameKey)
-        let lessonId: Node? = try json.get(Teacher.lessonIdKey)
+        let lessonId: Identifier? = try json.get(Teacher.lessonIdKey)
         self.init(name: name, lessonId: lessonId)
     }
     
