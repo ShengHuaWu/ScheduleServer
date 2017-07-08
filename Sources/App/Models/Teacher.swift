@@ -12,21 +12,26 @@ final class Teacher: Model {
     let storage = Storage() // This is for Storable protocol
     
     var name: String
+    var lessonId: Node?
     
     static let idKey = "id"
     static let nameKey = "name"
+    static let lessonIdKey = "lesson_id"
     
-    init(name: String) {
+    init(name: String, lessonId: Node? = nil) {
         self.name = name
+        self.lessonId = lessonId
     }
     
     init(row: Row) throws {
         self.name = try row.get(Teacher.nameKey)
+        self.lessonId = try row.get(Teacher.lessonIdKey)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
         try row.set(Teacher.nameKey, name)
+        try row.set(Teacher.lessonIdKey, lessonId)
         return row
     }
 }
@@ -36,6 +41,7 @@ extension Teacher: Preparation {
         try database.create(self) { (user) in
             user.id()
             user.string(Teacher.nameKey)
+            user.parent(Lesson.self, optional: false)
         }
     }
     
@@ -46,13 +52,16 @@ extension Teacher: Preparation {
 
 extension Teacher: JSONConvertible {
     convenience init(json: JSON) throws {
-        self.init(name: try json.get(Teacher.nameKey))
+        let name: String = try json.get(Teacher.nameKey)
+        let lessonId: Node? = try json.get(Teacher.lessonIdKey)
+        self.init(name: name, lessonId: lessonId)
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
         try json.set(Teacher.idKey, id?.string)
         try json.set(Teacher.nameKey, name)
+        try json.set(Teacher.lessonIdKey, lessonId)
         return json
     }
 }

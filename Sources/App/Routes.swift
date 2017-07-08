@@ -5,6 +5,7 @@ extension Droplet {
         // Add routes with -resource method
         let lessonController = LessonController()
         resource("lessons", lessonController)
+        lessonController.addRoutes(self)
         
         let teacherController = TeacherController()
         resource("teachers", teacherController)

@@ -34,6 +34,20 @@ final class LessonController {
         try lesson.delete()
         return lesson
     }
+    
+    // TODO: Need to refactor
+    func addRoutes(_ drop: Droplet) {
+        drop.get("lessons", Int.parameter, "teachers", handler: teachersIndex)
+    }
+    
+    private func teachersIndex(request: Request) throws -> ResponseRepresentable {
+        guard let lesson = try Lesson.makeQuery().filter("id", request.parameters.next() as Int).first() else {
+            throw Abort.badRequest
+        }
+        
+        let teachers = try lesson.children(type: Teacher.self).all()
+        return try teachers.makeJSON()
+    }
 }
 
 // Notice the difference between Item and Muliple

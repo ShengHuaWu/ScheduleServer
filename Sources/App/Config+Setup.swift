@@ -1,4 +1,3 @@
-import FluentProvider
 import PostgreSQLProvider
 
 extension Config {
