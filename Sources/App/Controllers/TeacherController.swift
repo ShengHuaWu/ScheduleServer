@@ -35,18 +35,24 @@ final class TeacherController {
         return teacher
     }
     
-    // TODO: Need refactoring
     func addRoutes(_ drop: Droplet) {
-        drop.get("teachers", Int.parameter, "lesson", handler: userIndex)
+        let teachersGroup = drop.grouped("teachers")
+        teachersGroup.post(Teacher.parameter, "teaches", Lesson.parameter, handler: teaches)
+        teachersGroup.get(Teacher.parameter, "lessons", handler: lessons)
     }
     
-    // Should consider many to many relationship
-    private func userIndex(request: Request) throws -> ResponseRepresentable {
-        guard let teacher = try Teacher.makeQuery().filter("id", request.parameters.next() as Int).first() else {
-            throw Abort.badRequest
-        }
+    private func teaches(request: Request) throws -> ResponseRepresentable {
+        let teacher = try request.parameters.next(Teacher.self)
+        let lesson = try request.parameters.next(Lesson.self)
+        let pivot = try Pivot<Teacher, Lesson>(teacher, lesson)
+        try pivot.save()
         
-        return try JSON(node: teacher.lesson())
+        return teacher
+    }
+    
+    private func lessons(request: Request) throws -> ResponseRepresentable {
+        let teacher = try request.parameters.next(Teacher.self)
+        return try teacher.lessons().makeJSON()
     }
 }
 
@@ -71,7 +77,8 @@ extension Request {
 }
 
 extension Teacher {
-    func lesson() throws -> Lesson? {
-        return try parent(id: lessonId, type: Lesson.self).get()
+    func lessons() throws -> [Lesson] {
+        let lessons: Siblings<Teacher, Lesson, Pivot<Teacher, Lesson>> = siblings()
+        return try lessons.all()
     }
 }

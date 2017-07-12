@@ -23,5 +23,6 @@ extension Config {
         preparations.append(Lesson.self)
         preparations.append(Teacher.self)
         preparations.append(Student.self)
+        preparations.append(Pivot<Teacher, Lesson>.self) 
     }
 }

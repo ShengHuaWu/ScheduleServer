@@ -37,15 +37,12 @@ final class LessonController {
     
     // TODO: Need refactoring
     func addRoutes(_ drop: Droplet) {
-        // Perhaps, it is better not to use ResourceRepresentable protocol
-        drop.get("lessons", Int.parameter, "teachers", handler: teachersIndex)
+        let lessonsGroup = drop.grouped("lessons")
+        lessonsGroup.get(Lesson.parameter, "teachers", handler: teachers)
     }
     
-    private func teachersIndex(request: Request) throws -> ResponseRepresentable {
-        guard let lesson = try Lesson.makeQuery().filter("id", request.parameters.next() as Int).first() else {
-            throw Abort.badRequest
-        }
-        
+    private func teachers(request: Request) throws -> ResponseRepresentable {
+        let lesson = try request.parameters.next(Lesson.self)
         return try lesson.teachers().makeJSON()
     }
 }
@@ -72,9 +69,9 @@ extension Request {
     }
 }
 
-// Convenience of retrieving Teacher children
 extension Lesson {
     func teachers() throws -> [Teacher] {
-        return try children(type: Teacher.self).all()
+        let teachers: Siblings<Lesson, Teacher, Pivot<Teacher, Lesson>> = siblings()
+        return try teachers.all()
     }
 }
