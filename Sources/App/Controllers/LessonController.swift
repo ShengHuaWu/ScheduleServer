@@ -69,6 +69,7 @@ extension Request {
     }
 }
 
+// Convenience of retrieving Teacher siblings
 extension Lesson {
     func teachers() throws -> [Teacher] {
         let teachers: Siblings<Lesson, Teacher, Pivot<Teacher, Lesson>> = siblings()
