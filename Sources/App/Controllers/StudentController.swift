@@ -8,33 +8,55 @@
 
 import PostgreSQLProvider
 
-final class StudentController: ResourceRepresentable {
-    private func getAll(request: Request) throws -> ResponseRepresentable {
+final class StudentController {
+    fileprivate func getAll(request: Request) throws -> ResponseRepresentable {
         return try Student.all().makeJSON()
     }
     
-    private func getOne(request: Request, student: Student) throws -> ResponseRepresentable {
+    fileprivate func getOne(request: Request, student: Student) throws -> ResponseRepresentable {
         return student
     }
     
-    private func create(request: Request) throws -> ResponseRepresentable {
+    fileprivate func create(request: Request) throws -> ResponseRepresentable {
         let student = try request.student()
         try student.save()
         return student
     }
     
-    private func update(request: Request, student: Student) throws -> ResponseRepresentable {
+    fileprivate func update(request: Request, student: Student) throws -> ResponseRepresentable {
         let newStudent = try request.student()
         student.name = newStudent.name
         try student.save()
         return student
     }
     
-    private func delete(request: Request, student: Student) throws -> ResponseRepresentable {
+    fileprivate func delete(request: Request, student: Student) throws -> ResponseRepresentable {
         try student.delete()
         return student
     }
     
+    func addRouters(_ drop: Droplet) {
+        let studentsGroup = drop.grouped("students")
+        studentsGroup.post(Student.parameter, "enrolles", Lesson.parameter, handler: enrolles)
+        studentsGroup.get(Student.parameter, "lessons", handler: lessons)
+    }
+    
+    private func enrolles(request: Request) throws -> ResponseRepresentable {
+        let student = try request.parameters.next(Student.self)
+        let lesson = try request.parameters.next(Lesson.self)
+        let pivot = try Pivot<Student, Lesson>(student, lesson)
+        try pivot.save()
+        
+        return student
+    }
+    
+    private func lessons(request: Request) throws -> ResponseRepresentable {
+        let student = try request.parameters.next(Student.self)
+        return try student.lessons().makeJSON()
+    }
+}
+
+extension StudentController: ResourceRepresentable {
     func makeResource() -> Resource<Student> {
         return Resource(
             index: getAll,
@@ -51,5 +73,12 @@ extension Request {
         guard let json = json else { throw Abort.badRequest }
         
         return try Student(json: json)
+    }
+}
+
+extension Student {
+    func lessons() throws -> [Lesson] {
+        let lessons: Siblings<Student, Lesson, Pivot<Student, Lesson>> = siblings()
+        return try lessons.all()
     }
 }

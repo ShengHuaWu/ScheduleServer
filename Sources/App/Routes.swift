@@ -13,5 +13,6 @@ extension Droplet {
         
         let studentController = StudentController()
         resource("students", studentController)
+        studentController.addRouters(self)
     }
 }

@@ -39,11 +39,17 @@ final class LessonController {
     func addRoutes(_ drop: Droplet) {
         let lessonsGroup = drop.grouped("lessons")
         lessonsGroup.get(Lesson.parameter, "teachers", handler: teachers)
+        lessonsGroup.get(Lesson.parameter, "students", handler: students)
     }
     
     private func teachers(request: Request) throws -> ResponseRepresentable {
         let lesson = try request.parameters.next(Lesson.self)
         return try lesson.teachers().makeJSON()
+    }
+    
+    private func students(request: Request) throws -> ResponseRepresentable {
+        let lesson = try request.parameters.next(Lesson.self)
+        return try lesson.students().makeJSON()
     }
 }
 
@@ -69,10 +75,16 @@ extension Request {
     }
 }
 
-// Convenience of retrieving Teacher siblings
+// Convenience of retrieving siblings
 extension Lesson {
     func teachers() throws -> [Teacher] {
+        // It's necessary to give specific types
         let teachers: Siblings<Lesson, Teacher, Pivot<Teacher, Lesson>> = siblings()
         return try teachers.all()
+    }
+    
+    func students() throws -> [Student] {
+        let students: Siblings<Lesson, Student, Pivot<Student, Lesson>> = siblings()
+        return try students.all()
     }
 }
