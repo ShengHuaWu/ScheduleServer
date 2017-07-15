@@ -1,1 +1,12 @@
-### RESTful Server with Vapor 2
+## Server Side Swift with Vapor 2
+Before Swift was open source in 2015, I had tried to write a simple RESTful API server with Node.js.
+However, I did not have enough time digging deeper because I have not been familiar with Javascript syntax and backend development.
+Nowadays, there are several different server side Swift frameworks, such as [Vapor](https://github.com/vapor/vapor), [Perfect](https://github.com/PerfectlySoft/Perfect), and [Kitura](https://github.com/IBM-Swift/Kitura).
+As an iOS developer, it is a good chance to broaden my horizon in backend development.
+
+### Why Vapor
+According to its GitHub page, Vapor is the most used web framework for Swift.
+It provides a beautifully expressive and easy to use foundation for your next website, API, or cloud project.
+More importantly, there are series free [tutorials on raywenderlich.com website](https://videos.raywenderlich.com/screencasts/509-server-side-swift-with-vapor-getting-started).
+These tutorials give me a basic concept of how to build up an API server with Vapor, even though they are made in the previous version.
+Thank you [Ray](https://twitter.com/rwenderlich)!
