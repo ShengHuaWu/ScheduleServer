@@ -15,8 +15,8 @@ Thank you [Ray](https://twitter.com/rwenderlich)!
 In this article, I will demonstrate a simple RESTful API server which manipulates three models: Lesson, Teacher, and Student.
 Basically, we need the following endpoints:
 
-1. /{models}: Fetch all model objects via a GET request or create a new model object via a POST request with a JSON body. (Just replace {models} with lessons, teachers, and students.)
-2. /{models}/id: Fetch a specific model object via a GET request, delete one model object via a DELETE request, or update an existing model object via a PATCH request with a JSON body.
+1. `/{models}`: Fetch all model objects via a GET request or create a new model object via a POST request with a JSON body. (Just replace {models} with lessons, teachers, and students.)
+2. `/{models}/id`: Fetch a specific model object via a GET request, delete one model object via a DELETE request, or update an existing model object via a PATCH request with a JSON body.
 
 ### Configuration
 Before we dive into coding, there are several necessary configurations.
@@ -205,4 +205,57 @@ func setupRoutes() throws {
 
 ### Where To Go From Here
 At this point, we achieve a simple RESTful API server, and we can test model CRUD with [Postman](https://www.getpostman.com).
-In the part 2 of this series, I will demonstrate how to implement a sibling (many to many) relationship between two models.
+In [the part 2 of this series](), I will demonstrate how to implement a sibling (many to many) relationship between two models.
+
+## Server Side Swift with Vapor 2 (Part 2)
+In [the previous part of this series](), we have created a RESTful API server which manipulates three models --- Lesson, Teacher, and Student.
+In this article, I am going to build up a sibling relationship between Teacher and Lesson, and it is possible to follow the same pattern to achieve the relationship between Student and Lesson.
+
+### Introduction
+Basically, we need to define the following three endpoints:
+
+1. `/teachers/teacher_id/teaches/lesson_id`: Set a sibling relationship between Teacher and Lesson via a POST request.
+2. `/teachers/teacher_id/lessons`: Fetch all Lesson objects corresponding to a specific Teacher object.
+3. `/lessons/lesson_id/teachers`: Fetch all Teacher objects corresponding to a specific Lesson object.
+
+### Implementation
+First of all, in order to describe a sibling relationship, it is necessary to store the pair of models' identifiers into a new table called `Pivot`.
+Therefore, let's move to the `Config+Setup.swift` file and add the following line into the `setupPreparations` method.
+```
+private func setupPreparations() throws {
+    // ...
+    preparations.append(Pivot<Teacher, Lesson>.self)
+}
+```
+Secondly, we also need to define a new endpoint, in order to save the identifier pair into our `Pivot` table via a POST request.
+Thus, switch to `TeahcerController.swift` file and add the following two new methods.
+```
+func addRoutes(_ drop: Droplet) {
+    let teachersGroup = drop.grouped("teachers")
+    teachersGroup.post(Teacher.parameter, "teaches", Lesson.parameter, handler: teaches)
+  }
+
+private func teaches(request: Request) throws -> ResponseRepresentable {
+    let teacher = try request.parameters.next(Teacher.self)
+    let lesson = try request.parameters.next(Lesson.self)
+    let pivot = try Pivot<Teacher, Lesson>(teacher, lesson)
+    try pivot.save()
+
+    return teacher
+}
+```
+The reason why we have to create the `addRoutes` method is this endpoint doesn't belong to the RESTful API design diagram.
+In other words, we need this method to connect with the `Droplet` object.
+So, open the `Routes.swift` file and modify the `setupRoutes` method.
+```
+func setupRoutes() throws {
+    // ...
+    let teacherController = TeacherController()
+    resource("teachers", teacherController)
+    teacherController.addRoutes(self)
+
+    // ...
+}
+```
+At this point, we are able to generate a sibling relationship between Teacher and Lesson.
+Let's continue implementing how to retrieve the relevant model objects. 
