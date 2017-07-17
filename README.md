@@ -1,8 +1,8 @@
 ## Server Side Swift with Vapor 2 (Part 1)
 Before Swift was open source in 2015, I had tried to write a simple RESTful API server with Node.js.
-However, I did not have enough time digging deeper because I have not been familiar with Javascript syntax and backend development.
+However, I did not have enough time digging deeper because I have not been familiar with Javascript syntax and back-end development.
 Nowadays, there are several different server side Swift frameworks, such as [Vapor](https://github.com/vapor/vapor), [Perfect](https://github.com/PerfectlySoft/Perfect), and [Kitura](https://github.com/IBM-Swift/Kitura).
-As an iOS developer, it is a good chance to broaden my horizon in backend development.
+As an iOS developer, it is a good chance to broaden my horizon in back-end development.
 
 ### Why Vapor
 According to its GitHub page, Vapor is the most used web framework for Swift.
@@ -12,7 +12,7 @@ These tutorials give me a basic concept of how to build up an API server with Va
 Thank you [Ray](https://twitter.com/rwenderlich)!
 
 ### Introduction
-In this article, I will demonstrate a simple RESTful API server which manipulates three models: Lesson, Teacher, and Student.
+In this article, I will demonstrate a simple RESTful API server which manipulates three models: `Lesson`, `Teacher`, and `Student`.
 Basically, we need the following endpoints:
 
 1. `/{models}`: Fetch all model objects via a GET request or create a new model object via a POST request with a JSON body. (Just replace {models} with lessons, teachers, and students.)
@@ -208,15 +208,15 @@ At this point, we achieve a simple RESTful API server, and we can test model CRU
 In [the part 2 of this series](), I will demonstrate how to implement a sibling (many to many) relationship between two models.
 
 ## Server Side Swift with Vapor 2 (Part 2)
-In [the previous part of this series](), we have created a RESTful API server which manipulates three models --- Lesson, Teacher, and Student.
-In this article, I am going to build up a sibling relationship between Teacher and Lesson, and it is possible to follow the same pattern to achieve the relationship between Student and Lesson.
+In [the previous part of this series](), we have created a RESTful API server which manipulates three models --- `Lesson`, `Teacher`, and `Student`.
+In this article, I am going to build up a sibling relationship between `Teacher` and `Lesson`, and it is possible to follow the same pattern to achieve the relationship between `Student` and `Lesson`.
 
 ### Introduction
 Basically, we need to define the following three endpoints:
 
-1. `/teachers/teacher_id/teaches/lesson_id`: Set a sibling relationship between Teacher and Lesson via a POST request.
-2. `/teachers/teacher_id/lessons`: Fetch all Lesson objects corresponding to a specific Teacher object.
-3. `/lessons/lesson_id/teachers`: Fetch all Teacher objects corresponding to a specific Lesson object.
+1. `/teachers/teacher_id/teaches/lesson_id`: Set a sibling relationship between `Teacher` and `Lesson` via a POST request.
+2. `/teachers/teacher_id/lessons`: Fetch all `Lesson` objects corresponding to a specific `Teacher` object.
+3. `/lessons/lesson_id/teachers`: Fetch all `Teacher` objects corresponding to a specific `Lesson` object.
 
 ### Implementation
 First of all, in order to describe a sibling relationship, it is necessary to store the pair of models' identifiers into a new table called `Pivot`.
@@ -257,5 +257,77 @@ func setupRoutes() throws {
     // ...
 }
 ```
-At this point, we are able to generate a sibling relationship between Teacher and Lesson.
-Let's continue implementing how to retrieve the relevant model objects. 
+At this point, we are able to generate a sibling relationship between `Teacher` and `Lesson`.
+Let's continue implementing how to retrieve the relevant model objects.
+In `TeacherController.swift` file, add another new method and a new endpoint.
+In addition, create an extension of `Teacher` to get the sibling of `Lesson` easily.
+```
+final class TeacherController {
+  // ...
+
+  func addRoutes(_ drop: Droplet) {
+      let teachersGroup = drop.grouped("teachers")
+      // ...
+      teachersGroup.get(Teacher.parameter, "lessons", handler: lessons)
+  }
+
+  private func lessons(request: Request) throws -> ResponseRepresentable {
+      let teacher = try request.parameters.next(Teacher.self)
+      return try teacher.lessons().makeJSON()
+  }
+}
+
+// ...
+
+extension Teacher {
+    func lessons() throws -> [Lesson] {
+        let lessons: Siblings<Teacher, Lesson, Pivot<Teacher, Lesson>> = siblings()
+        return try lessons.all()
+    }
+}
+```
+Next, we add the following methods and an extension of `Lesson` within `LessonController.swift`, in order to fetch the corresponding `Teacher` sibling.
+```
+final class LessonController {
+    // ...
+
+    func addRoutes(_ drop: Droplet) {
+        let lessonsGroup = drop.grouped("lessons")
+        lessonsGroup.get(Lesson.parameter, "teachers", handler: teachers)
+    }
+
+    private func teachers(request: Request) throws -> ResponseRepresentable {
+        let lesson = try request.parameters.next(Lesson.self)
+        return try lesson.teachers().makeJSON()
+    }
+}
+
+// ...
+
+extension Lesson {
+    func teachers() throws -> [Teacher] {
+        let teachers: Siblings<Lesson, Teacher, Pivot<Teacher, Lesson>> = siblings()
+        return try teachers.all()
+    }
+}
+```
+Finally, remember to hook up the new endpoint with the `Droplet` object in `Routes.swift` file.
+```
+func setupRoutes() throws {
+    let lessonController = LessonController()
+    resource("lessons", lessonController)
+    lessonController.addRoutes(self)
+
+    // ...
+}
+```
+
+### Conclusion
+The entire sample code is [here](https://github.com/ShengHuaWu/ScheduleServer).
+
+Again, we can test our new endpoints with [Postman](https://www.getpostman.com).
+However, let's talk about the pros and cons of Vapor.
+On one hand, the merits include [well-defined documentations](https://docs.vapor.codes/2.0/), useful built-in functions, and [a migration tool](https://github.com/vapor/migrator).
+On the other hand, the downsides are fewer search results for Vapor 2 than 1, and Swift keeps evolving.
+Still, I personally think Vapor is a good opportunity to learn back-end development for a iOS developer.
+I'm totally open to discussion and feedback, so please share your thoughts.
