@@ -205,10 +205,10 @@ func setupRoutes() throws {
 
 ### Where To Go From Here
 At this point, we achieve a simple RESTful API server, and we can test model CRUD with [Postman](https://www.getpostman.com).
-In [the part 2 of this series](), I will demonstrate how to implement a sibling (many to many) relationship between two models.
+In [the part 2 of this series](https://medium.com/@shenghuawu/server-side-swift-with-vapor-2-part-2-844146ef1994), I will demonstrate how to implement a sibling (many to many) relationship between two models.
 
 ## Server Side Swift with Vapor 2 (Part 2)
-In [the previous part of this series](), we have created a RESTful API server which manipulates three models --- `Lesson`, `Teacher`, and `Student`.
+In [the previous part of this series](https://medium.com/@shenghuawu/server-side-swift-with-vapor-2-part-1-1b050c19249b), we have created a RESTful API server which manipulates three models --- `Lesson`, `Teacher`, and `Student`.
 In this article, I am going to build up a sibling relationship between `Teacher` and `Lesson`, and it is possible to follow the same pattern to achieve the relationship between `Student` and `Lesson`.
 
 ### Introduction
