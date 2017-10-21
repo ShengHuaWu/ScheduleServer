@@ -20,7 +20,7 @@ Basically, we need the following endpoints:
 
 ### Configuration
 Before we dive into coding, there are several necessary configurations.
-First of all, follow [the instructions on Vapor's website](https://docs.vapor.codes/2.0/getting-started/install-on-macos/) to install Vapor correctly, and then use `vapor your_project_name --template=api` to create a new project.
+First of all, follow [the instructions on Vapor's website](https://docs.vapor.codes/2.0/getting-started/install-on-macos/) to install Vapor correctly, and then use `vapor new your_project_name --template=api` to create a new project.
 Secondly, I choose to use PostgreSQL as my database server in this project, so it is necessary to install PostgreSQL on my Macbook and add the [PostgreSQL provider for Vapor](https://github.com/vapor-community/postgresql-provider) into my project dependencies.
 After starting PostgreSQL server, open and modify the `Package.swift` file as following.
 ```
