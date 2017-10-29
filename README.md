@@ -43,6 +43,10 @@ Then, create a new file called `postgresql.json` under the directory `Config/sec
     "port": 5432
 }
 ```
+Remember to replace the driver within `Config/fluent.json` with the following.
+```
+"driver": "postgresql"
+```
 The final step is to add the PostgreSQL provider within the `Config+Setup.swift` file.
 ```
 import PostgreSQLProvider
